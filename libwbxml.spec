@@ -13,11 +13,12 @@ URL:		http://libwbxml.aymerick.com/
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
-The WBXML2 format is a binary representation of XML, defined by the Wap
-Forum, and used to reduce bandwidth in mobile communications.
+The WBXML2 format is a binary representation of XML, defined by the
+Wap Forum, and used to reduce bandwidth in mobile communications.
 
 %description -l pl
-Format WBXML2 jest binarn± reprezentacj± XML, zdefiniowan± przez Wap Forum.
+Format WBXML2 jest binarn± reprezentacj± XML, zdefiniowan± przez Wap
+Forum.
 
 %package devel
 Summary:	Header files for WBXML2 library
