@@ -10,6 +10,8 @@ Source0:	http://dl.sourceforge.net/wbxmllib/%{name}-%{version}-src.tar.gz
 # Source0-md5:	3f9b5bf104ec523b8eebe69f93919ded
 Patch0:		http://www.multisync.org/files/%{name}-0.9.0.patch
 URL:		http://libwbxml.aymerick.com/
+BuildRequires:	autoconf
+BuildRequires:	automake
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
