@@ -12,6 +12,7 @@ Patch0:		http://www.multisync.org/files/%{name}-0.9.0.patch
 URL:		http://libwbxml.aymerick.com/
 BuildRequires:	autoconf
 BuildRequires:	automake
+BuildRequires:	libtool
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -20,11 +21,12 @@ Wap Forum, and used to reduce bandwidth in mobile communications.
 
 %description -l pl
 Format WBXML2 jest binarn± reprezentacj± XML, zdefiniowan± przez Wap
-Forum.
+Forum, maj±c± na celu zmniejszenie ruchu w komunikacji przez
+urz±dzenia przeno¶ne.
 
 %package devel
 Summary:	Header files for WBXML2 library
-Summary(pl):	Pliki nag³ówkowe biblioteki WBXML
+Summary(pl):	Pliki nag³ówkowe biblioteki WBXML2
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
 
@@ -61,8 +63,6 @@ Statyczna biblioteka WBXML2.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-# create directories if necessary
-#install -d $RPM_BUILD_ROOT
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -78,7 +78,6 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS ChangeLog NEWS README THANKS TODO
 %attr(755,root,root) %{_bindir}/*
 %attr(755,root,root) %{_libdir}/lib*.so.*.*.*
-# %{_datadir}/%{name}
 
 %files devel
 %defattr(644,root,root,755)
