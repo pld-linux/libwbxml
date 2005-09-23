@@ -3,7 +3,6 @@ Summary(pl):	Biblioteka WBXML2
 Name:		wbxml2
 Version:	0.9.0
 Release:	1
-Epoch:		0
 License:	GPL
 Group:		Libraries
 Source0:	http://dl.sourceforge.net/wbxmllib/%{name}-%{version}-src.tar.gz
