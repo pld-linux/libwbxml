@@ -1,5 +1,5 @@
 Summary:	WBXML2 Library
-Summary(pl.UTF-8):   Biblioteka WBXML2
+Summary(pl.UTF-8):	Biblioteka WBXML2
 Name:		wbxml2
 Version:	0.9.0
 Release:	1
@@ -25,7 +25,7 @@ urządzenia przenośne.
 
 %package devel
 Summary:	Header files for WBXML2 library
-Summary(pl.UTF-8):   Pliki nagłówkowe biblioteki WBXML2
+Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki WBXML2
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
 
@@ -37,7 +37,7 @@ Pliki nagłówkowe biblioteki WBXML2.
 
 %package static
 Summary:	Static WBXML2 library
-Summary(pl.UTF-8):   Statyczna biblioteka WBXML2
+Summary(pl.UTF-8):	Statyczna biblioteka WBXML2
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 
