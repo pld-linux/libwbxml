@@ -1,5 +1,5 @@
 Summary:	WBXML2 Library
-Summary(pl):	Biblioteka WBXML2
+Summary(pl.UTF-8):   Biblioteka WBXML2
 Name:		wbxml2
 Version:	0.9.0
 Release:	1
@@ -18,33 +18,33 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 The WBXML2 format is a binary representation of XML, defined by the
 Wap Forum, and used to reduce bandwidth in mobile communications.
 
-%description -l pl
-Format WBXML2 jest binarn± reprezentacj± XML, zdefiniowan± przez Wap
-Forum, maj±c± na celu zmniejszenie ruchu w komunikacji przez
-urz±dzenia przeno¶ne.
+%description -l pl.UTF-8
+Format WBXML2 jest binarnÄ… reprezentacjÄ… XML, zdefiniowanÄ… przez Wap
+Forum, majÄ…cÄ… na celu zmniejszenie ruchu w komunikacji przez
+urzÄ…dzenia przenoÅ›ne.
 
 %package devel
 Summary:	Header files for WBXML2 library
-Summary(pl):	Pliki nag³ówkowe biblioteki WBXML2
+Summary(pl.UTF-8):   Pliki nagÅ‚Ã³wkowe biblioteki WBXML2
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
 
 %description devel
 Header files for WBXML2 library.
 
-%description devel -l pl
-Pliki nag³ówkowe biblioteki WBXML2.
+%description devel -l pl.UTF-8
+Pliki nagÅ‚Ã³wkowe biblioteki WBXML2.
 
 %package static
 Summary:	Static WBXML2 library
-Summary(pl):	Statyczna biblioteka WBXML2
+Summary(pl.UTF-8):   Statyczna biblioteka WBXML2
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 
 %description static
 Static WBXML2 library.
 
-%description static -l pl
+%description static -l pl.UTF-8
 Statyczna biblioteka WBXML2.
 
 %prep
