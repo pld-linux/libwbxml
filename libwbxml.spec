@@ -1,13 +1,13 @@
 Summary:	WBXML2 Library
 Summary(pl.UTF-8):	Biblioteka WBXML2
 Name:		wbxml2
-Version:	0.9.0
+Version:	0.9.2
 Release:	1
 License:	GPL
 Group:		Libraries
-Source0:	http://dl.sourceforge.net/wbxmllib/%{name}-%{version}-src.tar.gz
-# Source0-md5:	3f9b5bf104ec523b8eebe69f93919ded
-Patch0:		http://www.multisync.org/files/%{name}-0.9.0.patch
+Source0:	http://dl.sourceforge.net/wbxmllib/%{name}-%{version}.tar.gz
+# Source0-md5:	67a48fd9b69db8818a4dca5375c7993a
+Patch0:		%{name}-doc.patch
 URL:		http://libwbxml.aymerick.com/
 BuildRequires:	autoconf
 BuildRequires:	automake
