@@ -2,7 +2,7 @@ Summary:	WBXML2 Library
 Summary(pl.UTF-8):	Biblioteka WBXML2
 Name:		wbxml2
 Version:	0.9.2
-Release:	1
+Release:	2
 License:	GPL
 Group:		Libraries
 Source0:	http://dl.sourceforge.net/wbxmllib/%{name}-%{version}.tar.gz
@@ -75,14 +75,17 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS README THANKS TODO
-%attr(755,root,root) %{_bindir}/*
-%attr(755,root,root) %{_libdir}/lib*.so.*.*.*
+%attr(755,root,root) %{_bindir}/wbxml2xml
+%attr(755,root,root) %{_bindir}/xml2wbxml
+%attr(755,root,root) %{_libdir}/libwbxml2.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libwbxml2.so.?
 
 %files devel
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/lib*.so
-%{_libdir}/lib*.la
+%{_libdir}/libwbxml2.so
+%{_libdir}/libwbxml2.la
 %{_includedir}/*
+%{_pkgconfigdir}/libwbxml2.pc
 
 %files static
 %defattr(644,root,root,755)
