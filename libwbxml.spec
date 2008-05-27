@@ -82,11 +82,11 @@ rm -rf $RPM_BUILD_ROOT
 
 %files devel
 %defattr(644,root,root,755)
-%{_libdir}/libwbxml2.so
+%attr(755,root,root) %{_libdir}/libwbxml2.so
 %{_libdir}/libwbxml2.la
-%{_includedir}/*
+%{_includedir}/wbxml*.h
 %{_pkgconfigdir}/libwbxml2.pc
 
 %files static
 %defattr(644,root,root,755)
-%{_libdir}/lib*.a
+%{_libdir}/libwbxml2.a
