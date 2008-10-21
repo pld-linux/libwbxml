@@ -11,6 +11,8 @@ Patch0:		%{name}-doc.patch
 URL:		http://libwbxml.aymerick.com/
 BuildRequires:	autoconf
 BuildRequires:	automake
+BuildRequires:	expat-devel
+BuildRequires:	libstdc++-devel
 BuildRequires:	libtool
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
