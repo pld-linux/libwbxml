@@ -1,9 +1,13 @@
+# TODO:
+# - kill unecessary -lnsl etc.
+# - lib is linked with -lexpat, but .pc specifies libxml2
+#
 Summary:	WBXML2 Library
 Summary(pl.UTF-8):	Biblioteka WBXML2
 Name:		wbxml2
 Version:	0.9.2
 Release:	2
-License:	GPL
+License:	LGPL v2.1+
 Group:		Libraries
 Source0:	http://dl.sourceforge.net/wbxmllib/%{name}-%{version}.tar.gz
 # Source0-md5:	67a48fd9b69db8818a4dca5375c7993a
