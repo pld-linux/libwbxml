@@ -8,6 +8,7 @@ Group:		Libraries
 Source0:	http://dl.sourceforge.net/wbxmllib/%{name}-%{version}.tar.gz
 # Source0-md5:	67a48fd9b69db8818a4dca5375c7993a
 Patch0:		%{name}-doc.patch
+Patch1:		%{name}-version.patch
 URL:		http://libwbxml.aymerick.com/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -52,6 +53,7 @@ Statyczna biblioteka WBXML2.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
 %{__libtoolize}
