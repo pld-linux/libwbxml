@@ -6,7 +6,7 @@ Summary:	WBXML2 Library
 Summary(pl.UTF-8):	Biblioteka WBXML2
 Name:		wbxml2
 Version:	0.9.2
-Release:	2
+Release:	3
 License:	LGPL v2.1+
 Group:		Libraries
 Source0:	http://dl.sourceforge.net/wbxmllib/%{name}-%{version}.tar.gz
@@ -19,6 +19,7 @@ BuildRequires:	automake
 BuildRequires:	expat-devel
 BuildRequires:	libstdc++-devel
 BuildRequires:	libtool
+Obsoletes:	libwbxml2
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -35,6 +36,7 @@ Summary:	Header files for WBXML2 library
 Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki WBXML2
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
+Obsoletes:	libwbxml2-devel
 
 %description devel
 Header files for WBXML2 library.
