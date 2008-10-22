@@ -1,14 +1,13 @@
 # TODO:
 # - kill unecessary -lnsl etc.
 # - maybe add datetime.patch from synce repository
-# - add changeset 59 (fix for segfault)
 # - namespace.patch from synce trunk contains some improvements
 #
 Summary:	WBXML2 Library
 Summary(pl.UTF-8):	Biblioteka WBXML2
 Name:		wbxml2
 Version:	0.9.2
-Release:	3.3
+Release:	4
 License:	LGPL v2.1+
 Group:		Libraries
 Source0:	http://dl.sourceforge.net/wbxmllib/%{name}-%{version}.tar.gz
@@ -29,6 +28,7 @@ Patch12:	%{name}-r58.patch
 #Patch13:	http://synce.svn.sourceforge.net/viewvc/synce/trunk/patches/wbxml-svn-r53-namespace.patch?revision=2914
 Patch13:	%{name}-namespace.patch
 Patch14:	%{name}-no_libxml2.patch
+Patch15:	%{name}-r59.patch
 URL:		http://libwbxml.aymerick.com/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -89,6 +89,7 @@ Statyczna biblioteka WBXML2.
 %patch12 -p3
 %patch13 -p1
 %patch14 -p1
+%patch15 -p3
 
 %build
 %{__libtoolize}
