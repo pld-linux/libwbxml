@@ -6,13 +6,26 @@ Summary:	WBXML2 Library
 Summary(pl.UTF-8):	Biblioteka WBXML2
 Name:		wbxml2
 Version:	0.9.2
-Release:	3
+Release:	3.1
 License:	LGPL v2.1+
 Group:		Libraries
 Source0:	http://dl.sourceforge.net/wbxmllib/%{name}-%{version}.tar.gz
 # Source0-md5:	67a48fd9b69db8818a4dca5375c7993a
-Patch0:		%{name}-doc.patch
-Patch1:		%{name}-version.patch
+Patch0:		%{name}-r34.patch
+Patch1:		%{name}-r35.patch
+Patch2:		%{name}-r39.patch
+Patch3:		%{name}-r41.patch
+Patch4:		%{name}-r42.patch
+Patch5:		%{name}-r43.patch
+Patch6:		%{name}-r44.patch
+Patch7:		%{name}-prepare-r48.patch
+Patch8:		%{name}-r48.patch
+Patch9:		%{name}-r49.patch
+Patch10:	%{name}-r52.patch
+Patch11:	%{name}-r57.patch
+Patch12:	%{name}-r58.patch
+#Patch13:	http://synce.svn.sourceforge.net/viewvc/synce/trunk/patches/wbxml-svn-r53-namespace.patch?revision=2914
+Patch13:	%{name}-namespace.patch
 URL:		http://libwbxml.aymerick.com/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -58,8 +71,20 @@ Statyczna biblioteka WBXML2.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
+%patch0 -p3
+%patch1 -p3
+%patch2 -p3
+%patch3 -p3
+%patch4 -p3
+%patch5 -p3
+%patch6 -p3
+%patch7 -p0
+%patch8 -p3
+%patch9 -p3
+%patch10 -p3
+%patch11 -p3
+%patch12 -p3
+%patch13 -p1
 
 %build
 %{__libtoolize}
