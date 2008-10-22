@@ -1,0 +1,11 @@
+--- src/wbxml_parser.c.bak	2008-10-22 04:22:10.449813297 +0200
++++ src/wbxml_parser.c	2008-10-22 04:27:00.929849265 +0200
+@@ -2720,7 +2720,7 @@
+  * @note Used for:
+  *      - DRMREL 1.0
+  * @note [OMA-Download-DRMREL-v1_0-20020913-C.PDF] - 7.1:
+- *       "The content of the <KeyValue> element MUST be in binary format using the ‘opaque’ token."
++ *       "The content of the <KeyValue> element MUST be in binary format using the Â‘opaqueÂ’ token."
+  */
+ static WBXMLError decode_drmrel_keyvalue(WBXMLBuffer **data)
+ {
