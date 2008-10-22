@@ -1,0 +1,247 @@
+Index: /wbxml2/trunk/src/wbxml_tree.c
+===================================================================
+--- /wbxml2/trunk/src/wbxml_tree.c (revision 15)
++++ /wbxml2/trunk/src/wbxml_tree.c (revision 35)
+@@ -615,4 +615,38 @@
+ 
+     return TRUE;
++}
++
++
++WBXML_DECLARE(WBXMLError) wbxml_tree_node_extract(WBXMLTreeNode *node)
++{
++    if (node == NULL)
++        return WBXML_ERROR_BAD_PARAMETER;
++    
++    /* Parent link */
++    if (node->parent != NULL) {
++        if (node->parent->children == node) {
++            /* Update parent children */
++		    node->parent->children = node->next;
++        }
++
++        /* No more parent */
++        node->parent = NULL;
++    }
++
++    /* Next link */
++    if (node->next != NULL) {
++        /* Link next node to previous node */
++        node->next->prev = node->prev;
++        node->next = NULL;
++    }
++
++    /* Previous link */
++    if (node->prev != NULL) {
++        /* Link previous node to next node */
++        node->prev->next = node->next;
++        node->prev = NULL;
++    }
++    
++    return WBXML_OK;
+ }
+ 
+@@ -911,4 +945,6 @@
+ 
+ 
++/* Tree functions */
++
+ WBXML_DECLARE(WBXMLTree *) wbxml_tree_create(WBXMLLanguage lang,
+                                              WBXMLCharsetMIBEnum orig_charset)
+@@ -939,5 +975,4 @@
+ 
+ 
+-/** @todo Rewrite this function (use wbxml_tree_node_* functions) */
+ WBXML_DECLARE(WB_BOOL) wbxml_tree_add_node(WBXMLTree *tree, WBXMLTreeNode *parent, WBXMLTreeNode *node)
+ {
+@@ -946,25 +981,9 @@
+     if ((tree == NULL) || (node == NULL))
+         return FALSE;
+-
+-    /* Set parent to new node */
+-    node->parent = parent;    
+-
++    
+     /* Check if this is the Root Element */
+     if (parent != NULL) {
+-        /* This is not the Root Element... search for previous sibbling element */
+-        if (parent->children != NULL) {
+-            /* Add this Node to end of Sibbling Node list of Parent */
+-            tmp = parent->children;
+-
+-            while (tmp->next != NULL)
+-                tmp = tmp->next;
+-            
+-            node->prev = tmp;
+-            tmp->next = node;
+-        }
+-        else {
+-            /* No previous sibbling element */
+-            parent->children = node;
+-        }
++        if (!wbxml_tree_node_add_child(parent, node))
++            return FALSE;
+     }
+     else {
+@@ -975,4 +994,5 @@
+         /* This is the Root Element */
+         tree->root = node;
++        node->parent = NULL;
+     }
+ 
+@@ -981,5 +1001,4 @@
+ 
+ 
+-/** @todo Rewrite this function (use wbxml_tree_node_* functions) */
+ WBXML_DECLARE(WBXMLError) wbxml_tree_extract_node(WBXMLTree *tree,
+                                                   WBXMLTreeNode *node)
+@@ -987,39 +1006,14 @@
+     if ((tree == NULL) || (node == NULL))
+         return WBXML_ERROR_BAD_PARAMETER;
+-
+-    /* Parent link */
+-    if (node->parent != NULL) {
+-        if (node->parent->children == node) {
+-            /* Update parent children */
+-		    node->parent->children = node->next;
+-        }
+-
+-        /* No more parent */
+-        node->parent = NULL;
+-    }
+-    else {
++    
++    if (node == tree->root) {
+         /* Root removed ! */
+         tree->root = node->next;
+     }
+ 
+-    /* Next link */
+-    if (node->next != NULL) {
+-        /* Link next node to previous node */
+-        node->next->prev = node->prev;
+-        node->next = NULL;
+-    }
+-
+-    /* Previous link */
+-    if (node->prev != NULL) {
+-        /* Link previous node to next node */
+-        node->prev->next = node->next;
+-        node->prev = NULL;
+-    }
+-
+-    return WBXML_OK;
+-}
+-
+-
+-/** @todo Rewrite this function (use wbxml_tree_node_* functions) */
++    return wbxml_tree_node_extract(node);
++}
++
++
+ WBXML_DECLARE(WBXMLTreeNode *) wbxml_tree_add_elt(WBXMLTree *tree,
+                                                   WBXMLTreeNode *parent,
+@@ -1049,5 +1043,4 @@
+ 
+ 
+-/** @todo Rewrite this function (use wbxml_tree_node_* functions) */
+ WBXML_DECLARE(WBXMLTreeNode *) wbxml_tree_add_elt_with_attrs(WBXMLTree *tree,
+                                                              WBXMLTreeNode *parent,
+@@ -1076,34 +1069,13 @@
+ 
+ 
+-/** @todo Rewrite this function (use wbxml_tree_node_* functions) */
+ WBXML_DECLARE(WBXMLTreeNode *) wbxml_tree_add_xml_elt(WBXMLTree *tree,
+                                                       WBXMLTreeNode *parent,
+                                                       WB_UTINY *name)
+ {
+-    const WBXMLTagEntry *tag_entry = NULL;
+     WBXMLTreeNode *node = NULL;
+-    WBXMLTag *tag = NULL;
+-    
+-    /* Search for XML Tag Name in Table */
+-    if ((tag_entry = wbxml_tables_get_tag_from_xml(tree->lang, (const WB_UTINY *) name)) != NULL) {
+-        /* Found : token tag */
+-        tag = wbxml_tag_create_token(tag_entry);
+-    }
+-    else {
+-        /* Not found : literal tag */
+-        tag = wbxml_tag_create_literal(name);
+-    }
+-
+-    if (tag == NULL)
+-        return NULL;
+-
+-    /* Create a new Node */
+-    if ((node = wbxml_tree_node_create(WBXML_TREE_ELEMENT_NODE)) == NULL) {
+-        wbxml_tag_destroy(tag);
+-        return NULL;
+-    }
+-    
+-    /* Set Node Tag */
+-    node->name = tag;
++    
++    /* Create element node */
++    if ((node = wbxml_tree_node_create_xml_elt(tree->lang, (const WB_UTINY *) name)) == NULL)
++        return NULL;
+ 
+     /* Add this Node to Tree  */
+@@ -1117,5 +1089,4 @@
+ 
+ 
+-/** @todo Rewrite this function (use wbxml_tree_node_* functions) */
+ WBXML_DECLARE(WBXMLTreeNode *) wbxml_tree_add_xml_elt_with_attrs(WBXMLTree *tree,
+                                                                  WBXMLTreeNode *parent,
+@@ -1144,5 +1115,4 @@
+ 
+ 
+-/** @todo Rewrite this function (use wbxml_tree_node_* functions) */
+ WBXML_DECLARE(WBXMLTreeNode *) wbxml_tree_add_text(WBXMLTree *tree,
+                                                    WBXMLTreeNode *parent,
+@@ -1153,11 +1123,5 @@
+ 
+     /* Create a new Node */
+-    if ((node = wbxml_tree_node_create(WBXML_TREE_TEXT_NODE)) == NULL) {
+-        return NULL;
+-    }
+-
+-    /* Set Content */
+-    if ((node->content = wbxml_buffer_create(text, len, len)) == NULL) {
+-        wbxml_tree_node_destroy(node);
++    if ((node = wbxml_tree_node_create_text(text, len)) == NULL) {
+         return NULL;
+     }
+@@ -1173,5 +1137,4 @@
+ 
+ 
+-/** @todo Rewrite this function (use wbxml_tree_node_* functions) */
+ WBXML_DECLARE(WBXMLTreeNode *) wbxml_tree_add_cdata(WBXMLTree *tree,
+                                                     WBXMLTreeNode *parent)
+@@ -1197,5 +1160,4 @@
+ 
+ 
+-/** @todo Rewrite this function (use wbxml_tree_node_* functions) */
+ WBXML_DECLARE(WBXMLTreeNode *) wbxml_tree_add_tree(WBXMLTree *tree,
+                                                    WBXMLTreeNode *parent,
+@@ -1222,5 +1184,4 @@
+ 
+ 
+-/** @todo Rewrite this function (use wbxml_tree_node_* functions) */
+ WBXML_DECLARE(WBXMLTreeNode *) wbxml_tree_add_xml_elt_with_attrs_and_text(WBXMLTree *tree,
+                                                                           WBXMLTreeNode *parent,
+Index: /wbxml2/trunk/src/wbxml_tree.h
+===================================================================
+--- /wbxml2/trunk/src/wbxml_tree.h (revision 15)
++++ /wbxml2/trunk/src/wbxml_tree.h (revision 35)
+@@ -310,4 +310,11 @@
+ 
+ /**
++ * @brief Extract a node
++ * @param node Node to extract
++ * @return TRUE if extracted or FALSE if error
++ */
++WBXML_DECLARE(WBXMLError) wbxml_tree_node_extract(WBXMLTreeNode *node);
++
++/**
+  * @brief Add a WBXML Attribute to a Tree Node structure
+  * @param node The Tree Node to modify
