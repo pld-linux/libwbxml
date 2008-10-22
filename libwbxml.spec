@@ -1,6 +1,10 @@
 # TODO:
 # - kill unecessary -lnsl etc.
 # - lib is linked with -lexpat, but .pc specifies libxml2
+# - remove libxml junk from wbxml_tree.h - it breaks php-wbxml.spec
+# - maybe add datetime.patch from synce repository
+# - add changeset 59 (fix for segfault)
+# - namespace.patch from synce trunk contains some improvements
 #
 Summary:	WBXML2 Library
 Summary(pl.UTF-8):	Biblioteka WBXML2
