@@ -1,0 +1,392 @@
+diff -Naur wbxml2-original/src/wbxml_elt.c wbxml2-modified/src/wbxml_elt.c
+--- wbxml2-original/src/wbxml_elt.c	2007-04-15 15:41:39.000000000 -0400
++++ wbxml2-modified/src/wbxml_elt.c	2007-04-15 23:32:17.000000000 -0400
+@@ -39,6 +39,8 @@
+ #define WBXML_ELT_UNKNOWN_NAME ((WB_UTINY *)"unknown")
+ 
+ 
++/** For parsing namespaces from XML element names */
++#define WBXML_NAMESPACE_SEPARATOR ':'
+ 
+ /***************************************************
+  *    Public Functions
+@@ -329,3 +331,31 @@
+ 
+     return wbxml_buffer_get_cstr(attr->value);
+ }
++
++WBXML_DECLARE(void) wbxml_element_name_parse(const WB_UTINY *full_name, WB_UTINY **namespace_name, WB_UTINY **element_name)
++{
++    WB_UTINY *sep = NULL;
++
++    /* Separate the namespace from the element name */
++    sep = (WB_UTINY *) strrchr((const WB_TINY *) full_name, WBXML_NAMESPACE_SEPARATOR);
++    if (sep != NULL) {
++        /* Temporarily split the string by changing the separater to a null-terminator */
++        *sep = '\0';
++
++        if (namespace_name != NULL)
++            *namespace_name = (WB_UTINY *) wbxml_strdup((const WB_TINY *) full_name);
++        if (element_name != NULL)
++            *element_name = (WB_UTINY *) wbxml_strdup((const WB_TINY *) (sep + 1));
++
++        /* Put the separator back */
++        *sep = WBXML_NAMESPACE_SEPARATOR;
++    }
++    else {
++        /* No namespace, so the entire thing is the element name */
++        if (namespace_name != NULL)
++            *namespace_name = NULL;
++        if (element_name != NULL)
++            *element_name = (WB_UTINY *) wbxml_strdup((const WB_TINY *)full_name);
++    }
++}
++
+diff -Naur wbxml2-original/src/wbxml_elt.h wbxml2-modified/src/wbxml_elt.h
+--- wbxml2-original/src/wbxml_elt.h	2007-04-15 15:41:39.000000000 -0400
++++ wbxml2-modified/src/wbxml_elt.h	2007-04-15 22:29:17.000000000 -0400
+@@ -227,6 +227,13 @@
+  */
+ WBXML_DECLARE(const WB_UTINY *) wbxml_attribute_get_xml_value(WBXMLAttribute *attr);
+ 
++/**
++ * @brief Parse an XML element name into the namespace and the tag name
++ * @param full_name      Full element name (possibly including a namespace)
++ * @param namespace_name Upon return, will point to the namespace name (or NULL if none was specified)
++ * @param element_name   Upon return, will point to the element name
++ */
++WBXML_DECLARE(void) wbxml_element_name_parse(const WB_UTINY *full_name, WB_UTINY **namespace_name, WB_UTINY **element_name);
+ 
+ /** @} */
+ 
+diff -Naur wbxml2-original/src/wbxml_encoder.c wbxml2-modified/src/wbxml_encoder.c
+--- wbxml2-original/src/wbxml_encoder.c	2007-04-15 15:41:39.000000000 -0400
++++ wbxml2-modified/src/wbxml_encoder.c	2007-04-15 22:29:17.000000000 -0400
+@@ -1619,7 +1619,7 @@
+     }
+     else {
+         /* Search tag in Tags Table */
+-        if ((tag = wbxml_tables_get_tag_from_xml(encoder->lang, wbxml_tag_get_xml_name(node->name))) != NULL)
++        if ((tag = wbxml_tables_get_tag_from_xml(encoder->lang, encoder->tagCodePage, wbxml_tag_get_xml_name(node->name))) != NULL)
+         {
+             token = tag->wbxmlToken;
+             page = tag->wbxmlCodePage;
+diff -Naur wbxml2-original/src/wbxml_tables.c wbxml2-modified/src/wbxml_tables.c
+--- wbxml2-original/src/wbxml_tables.c	2007-04-15 15:41:39.000000000 -0400
++++ wbxml2-modified/src/wbxml_tables.c	2007-04-15 23:21:46.000000000 -0400
+@@ -2806,6 +2806,46 @@
+     { NULL,                     0x00, 0x00 }
+ };
+ 
++/* NOTE:
++ * These namespace names differ from the Microsoft-assigned namespaces.  The
++ * reason for the difference is that the Microsoft-assigned names are not
++ * valid URI's and hence produce warning messages when processed by some
++ * libraries.  The mapping is as follows:
++ * 
++ *   Microsoft	          Ours
++ *   ---------            ----
++ *   AirSync:             http://synce.org/formats/airsync_wm5/airsync
++ *   POOMCONTACTS:        http://synce.org/formats/airsync_wm5/contacts
++ *   POOMMAIL:            http://synce.org/formats/airsync_wm5/mail
++ *   AirNotify:           http://synce.org/formats/airsync_wm5/airnotify
++ *   POOMCAL:             http://synce.org/formats/airsync_wm5/calendar
++ *   Move:                http://synce.org/formats/airsync_wm5/move
++ *   GetItemEstimate:     http://synce.org/formats/airsync_wm5/getitemestimate
++ *   FolderHierarchy:     http://synce.org/formats/airsync_wm5/folderhierarchy
++ *   MeetingResponse:     http://synce.org/formats/airsync_wm5/meetingresponse
++ *   POOMTASKS:           http://synce.org/formats/airsync_wm5/tasks
++ *   ResolveRecipients:   http://synce.org/formats/airsync_wm5/resolverecipients
++ *   ValidateCert:        http://synce.org/formats/airsync_wm5/validatecert
++ *   POOMCONTACTS2:       http://synce.org/formats/airsync_wm5/contacts2
++ *
++ */
++const WBXMLNameSpaceEntry sv_airsync_ns_table[] = {
++    { "http://synce.org/formats/airsync_wm5/airsync",           0x00 },     /**< Code Page 0 */
++    { "http://synce.org/formats/airsync_wm5/contacts",          0x01 },     /**< Code Page 1 */
++    { "http://synce.org/formats/airsync_wm5/mail",              0x02 },     /**< Code Page 2 */
++    { "http://synce.org/formats/airsync_wm5/airnotify",         0x03 },     /**< Code Page 3 */
++    { "http://synce.org/formats/airsync_wm5/calendar",          0x04 },     /**< Code Page 4 */
++    { "http://synce.org/formats/airsync_wm5/move",              0x05 },     /**< Code Page 5 */
++    { "http://synce.org/formats/airsync_wm5/getitemestimate",   0x06 },     /**< Code Page 6 */
++    { "http://synce.org/formats/airsync_wm5/folderhierarchy",   0x07 },     /**< Code Page 7 */
++    { "http://synce.org/formats/airsync_wm5/meetingresponse",   0x08 },     /**< Code Page 8 */
++    { "http://synce.org/formats/airsync_wm5/tasks",             0x09 },     /**< Code Page 9 */
++    { "http://synce.org/formats/airsync_wm5/resolverecipients", 0x0a },     /**< Code Page 10 */
++    { "http://synce.org/formats/airsync_wm5/validatecert",      0x0b },     /**< Code Page 11 */
++    { "http://synce.org/formats/airsync_wm5/contacts2",         0x0c },     /**< Code Page 12 */
++    { NULL,                                                     0x00 }
++};
++
+ #endif /* WBXML_SUPPORT_AIRSYNC */
+ 
+ 
+@@ -2885,7 +2925,7 @@
+ #endif /* WBXML_SUPPORT_WV */
+ 
+ #if defined( WBXML_SUPPORT_AIRSYNC )
+-    { WBXML_LANG_AIRSYNC,           &sv_airsync_public_id,          sv_airsync_tag_table,           NULL,                           NULL,                       NULL,                           NULL },
++    { WBXML_LANG_AIRSYNC,           &sv_airsync_public_id,          sv_airsync_tag_table,           sv_airsync_ns_table,            NULL,                       NULL,                           NULL },
+ #endif /* WBXML_SUPPORT_AIRSYNC */
+ 
+     { WBXML_LANG_UNKNOWN,           NULL,                           NULL,                           NULL,                           NULL,                       NULL,                           NULL }
+@@ -2992,6 +3032,7 @@
+ 
+ 
+ WBXML_DECLARE(const WBXMLTagEntry *) wbxml_tables_get_tag_from_xml(const WBXMLLangEntry *lang_table,
++                                                                   WB_LONG code_page,
+                                                                    const WB_UTINY *xml_name)
+ {
+     WB_ULONG i = 0;
+@@ -2999,6 +3040,16 @@
+     if ((lang_table == NULL) || (lang_table->tagTable == NULL) || (xml_name == NULL))
+         return NULL;
+ 
++    /* Look in the specified code page first */
++    if (code_page >= 0)
++      while (lang_table->tagTable[i].xmlName != NULL) {
++          if (lang_table->tagTable[i].wbxmlCodePage == (WB_UTINY)code_page
++              && WBXML_STRCMP(lang_table->tagTable[i].xmlName, xml_name) == 0)
++              return &(lang_table->tagTable[i]);
++          i++;
++      }
++
++    i = 0;
+     while (lang_table->tagTable[i].xmlName != NULL) {
+         if (WBXML_STRCMP(lang_table->tagTable[i].xmlName, xml_name) == 0)
+             return &(lang_table->tagTable[i]);
+@@ -3146,3 +3197,21 @@
+ 
+     return NULL;
+ }
++
++WBXML_DECLARE(WB_UTINY) wbxml_tables_get_code_page(const WBXMLNameSpaceEntry *ns_table, const WB_TINY* xmlns)
++{
++    WB_ULONG i = 0;
++
++    if (ns_table == NULL)
++        return 0;
++
++    while (ns_table[i].xmlNameSpace != NULL)
++    {
++        if (strcmp(ns_table[i].xmlNameSpace, xmlns) == 0)
++            return ns_table[i].wbxmlCodePage;
++
++        i++;
++    }
++
++    return 0;
++}
+diff -Naur wbxml2-original/src/wbxml_tables.h wbxml2-modified/src/wbxml_tables.h
+--- wbxml2-original/src/wbxml_tables.h	2007-04-15 15:41:39.000000000 -0400
++++ wbxml2-modified/src/wbxml_tables.h	2007-04-15 23:25:00.000000000 -0400
+@@ -252,10 +252,12 @@
+ /**
+  * @brief Search for a Tag Entry in Language Table, given the XML Name of the Tag
+  * @param lang_table The Language Table to search in
++ * @param code_page Code page to be searched first (negative value indicates none specified)
+  * @param xml_name The XML Name of the Tag to search
+  * @return The Tag Entry of this XML Name in Language Table, or NULL if not found
+  */
+ WBXML_DECLARE(const WBXMLTagEntry *) wbxml_tables_get_tag_from_xml(const WBXMLLangEntry *lang_table,
++                                                                   WB_LONG code_page,
+                                                                    const WB_UTINY *xml_name);
+ 
+ /**
+@@ -305,6 +307,15 @@
+ WBXML_DECLARE(const WB_TINY *) wbxml_tables_get_xmlns(const WBXMLNameSpaceEntry *ns_table,
+                                                       WB_UTINY code_page);
+ 
++/**
++ * @brief Get a code page, given an XML NameSpace
++ * @param ns_table The NameSpace Table
++ * @param xmlns The XML NameSpace
++ * @return The WBXML Code Page. Returns 0 (default code page) if not found
++ */
++WBXML_DECLARE(WB_UTINY) wbxml_tables_get_code_page(const WBXMLNameSpaceEntry *ns_table,
++                                                   const WB_TINY* xmlns);
++
+ /** @} */
+ 
+ #ifdef __cplusplus
+diff -Naur wbxml2-original/src/wbxml_tree.c wbxml2-modified/src/wbxml_tree.c
+--- wbxml2-original/src/wbxml_tree.c	2007-04-15 15:41:39.000000000 -0400
++++ wbxml2-modified/src/wbxml_tree.c	2007-04-15 23:33:54.000000000 -0400
+@@ -34,6 +34,7 @@
+ 
+ #include "wbxml.h"
+ 
++#define WBXML_NAMESPACE_SEPARATOR ':'
+ 
+ /***************************************************
+  *    Public Functions
+@@ -194,7 +195,7 @@
+         *tree = NULL;
+ 
+     /* Create Expat XML Parser */
+-    if ((xml_parser = XML_ParserCreate(NULL)) == NULL)
++    if ((xml_parser = XML_ParserCreateNS(NULL, WBXML_NAMESPACE_SEPARATOR)) == NULL)
+         return WBXML_ERROR_NOT_ENOUGH_MEMORY;
+     
+     /* Init context */
+@@ -366,6 +367,8 @@
+     result->content = NULL;
+     result->tree = NULL;
+ 
++    result->code_page = -1;
++
+     result->parent = NULL;
+     result->children = NULL;
+     result->next = NULL;
+@@ -448,6 +451,7 @@
+ 
+ 
+ WBXML_DECLARE(WBXMLTreeNode *) wbxml_tree_node_create_xml_elt(const WBXMLLangEntry *lang_table,
++                                                              WB_LONG code_page,
+                                                               const WB_UTINY *name)
+ {
+     const WBXMLTagEntry *tag_entry = NULL;
+@@ -455,7 +459,7 @@
+     WBXMLTag *tag = NULL;
+     
+     /* Search for XML Tag Name in Table */
+-    if ((tag_entry = wbxml_tables_get_tag_from_xml(lang_table, name)) != NULL) {
++    if ((tag_entry = wbxml_tables_get_tag_from_xml(lang_table, code_page, name)) != NULL) {
+         /* Found : token tag */
+         tag = wbxml_tag_create_token(tag_entry);
+     }
+@@ -481,6 +485,7 @@
+ 
+ 
+ WBXML_DECLARE(WBXMLTreeNode *) wbxml_tree_node_create_xml_elt_with_text(const WBXMLLangEntry *lang_table,
++                                                                        WB_LONG code_page,
+                                                                         const WB_UTINY *name,
+                                                                         const WB_UTINY *text,
+                                                                         WB_ULONG len)
+@@ -489,7 +494,7 @@
+     WBXMLTreeNode *text_node = NULL;
+     
+     /* Create element node */
+-    if ((node = wbxml_tree_node_create_xml_elt(lang_table, name)) == NULL)
++    if ((node = wbxml_tree_node_create_xml_elt(lang_table, code_page, name)) == NULL)
+         return NULL;
+     
+     /* Create text node */
+@@ -597,6 +602,10 @@
+     /* Set parent to new node */
+     node->parent = parent;    
+ 
++    /* If the new node doesn't have a code page specified, inherit from the parent */
++    if (node->code_page < 0)
++        node->code_page = parent->code_page;
++
+     /* Search for previous sibbling element */
+     if (parent->children != NULL) {
+         /* Add this Node to end of Sibbling Node list of Parent */
+@@ -1073,9 +1082,27 @@
+                                                       WB_UTINY *name)
+ {
+     WBXMLTreeNode *node = NULL;
+-    
++    WB_UTINY *namespace_name = NULL;
++    WB_UTINY *element_name = NULL;
++    WB_LONG code_page;
++
++    /* Split out the namespace and element name */
++    wbxml_element_name_parse(name, &namespace_name, &element_name);
++
++    /* If a namespace was specified, look up the new code page.  Otherwise, use the parent's */
++    if (namespace_name != NULL)
++        code_page = wbxml_tables_get_code_page(tree->lang->nsTable, (WB_TINY *) namespace_name);
++    else
++        code_page = parent->code_page;
++
+     /* Create element node */
+-    if ((node = wbxml_tree_node_create_xml_elt(tree->lang, (const WB_UTINY *) name)) == NULL)
++    node = wbxml_tree_node_create_xml_elt(tree->lang, code_page, (const WB_UTINY *) element_name);
++
++    /* Free memory allocated for the namespace and element names */
++    wbxml_free(namespace_name);
++    wbxml_free(element_name);
++
++    if (node == NULL)
+         return NULL;
+ 
+     /* Add this Node to Tree  */
+@@ -1083,7 +1110,10 @@
+         wbxml_tree_node_destroy(node);
+         return NULL;
+     }
+-    
++   
++    /* Set the code page for the newly-created node */
++    node->code_page = code_page;
++
+     return node;
+ }
+ 
+diff -Naur wbxml2-original/src/wbxml_tree.h wbxml2-modified/src/wbxml_tree.h
+--- wbxml2-original/src/wbxml_tree.h	2007-04-15 15:41:39.000000000 -0400
++++ wbxml2-modified/src/wbxml_tree.h	2007-04-15 23:26:29.000000000 -0400
+@@ -72,6 +72,8 @@
+     WBXMLBuffer         *content;   /**< Node Content (if  type is 'WBXML_TREE_TEXT_NODE')  */
+     struct WBXMLTree_s  *tree;      /**< Node Tree (if  type is 'WBXML_TREE_TREE_NODE') */
+     
++    WB_LONG             code_page;  /**< Node Code Page (negative value indicates none specified)  */
++
+     struct WBXMLTreeNode_s  *parent;    /**< Parent Node */
+     struct WBXMLTreeNode_s  *children;  /**< Children Node */
+     struct WBXMLTreeNode_s  *next;      /**< Next sibling Node */
+@@ -251,21 +253,25 @@
+ /**
+  * @brief Create a Tree Node structure, given the XML node name
+  * @param lang_table Language table
++ * @param code_page  Code page for the new node (negative value indicates none specified)
+  * @param name       XML node name
+  * @return The newly created Tree Node, or NULL if not enough memory
+  */
+ WBXML_DECLARE(WBXMLTreeNode *) wbxml_tree_node_create_xml_elt(const WBXMLLangEntry *lang_table,
++                                                              WB_LONG code_page,
+                                                               const WB_UTINY *name);
+ 
+ /**
+  * @brief Create a Tree Node structure, given the XML node name and text content
+  * @param lang_table Language table
++ * @param code_page  Code page for the new node (negative value indicates none specified)
+  * @param name       XML node name
+  * @param text       Text content
+  * @param len        Text content length
+  * @return The newly created Tree Node, or NULL if not enough memory
+  */
+ WBXML_DECLARE(WBXMLTreeNode *) wbxml_tree_node_create_xml_elt_with_text(const WBXMLLangEntry *lang_table,
++                                                                        WB_LONG code_page,
+                                                                         const WB_UTINY *name,
+                                                                         const WB_UTINY *text,
+                                                                         WB_ULONG len);
+@@ -468,7 +474,7 @@
+  * @brief Add an Element Node to a Tree, given its XML Name
+  * @param tree   The Tree to modify
+  * @param parent Parent of the new Node (ie: Position where to add the new Node in Tree)
+- * @param name   XML element name to add
++ * @param name   XML element name to add (possibly including a namespace)
+  * @return The newly created node, or NULL if error.
+  * @note If 'parent' is NULL: if 'tree' already have a Root Element this function returns NULL, else 'node' becomes the Root Element of 'tree'
+  */
+@@ -480,7 +486,7 @@
+  * @brief Add an Element Node to Tree, with its WBXML Attributes, given there XML values
+  * @param tree   The Tree to modify
+  * @param parent Parent of the new Node (ie: Position where to add the new Node in Tree)
+- * @param name   XML element name to add
++ * @param name   XML element name to add (possibly including a namespace)
+  * @param attrs  XML element attributes
+  * @return The newly created node, or NULL if error.
+  * @note If 'parent' is NULL: if 'tree' already have a Root Element this function returns NULL, else 'node' becomes the Root Element of 'tree'
+@@ -532,7 +538,7 @@
+  * @brief Add an Element Node to a Tree, given its XML Name, its attributes and a text content
+  * @param tree   The Tree to modify
+  * @param parent Parent of the new Node (ie: Position where to add the new Node in Tree)
+- * @param name   XML element name to add
++ * @param name   XML element name to add (possibly including a namespace)
+  * @param attrs  XML element attributes
+  * @param text   Text content for this new element
+  * @param len    Text content length
