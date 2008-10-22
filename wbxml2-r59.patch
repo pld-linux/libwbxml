@@ -1,0 +1,22 @@
+Index: /wbxml2/trunk/ChangeLog
+===================================================================
+--- /wbxml2/trunk/ChangeLog (revision 58)
++++ /wbxml2/trunk/ChangeLog (revision 59)
+@@ -4,4 +4,6 @@
+     linux box anymore to test. So if you have issues when compiling on linux, send me
+     a mail please.
++  * Fixing bug causing a segfault, and reported on debian bug tracking:
++    http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=310621
+ 
+ 2006-07-10  Aymerick Jehanne <aymerick@jehanne.org>
+Index: /wbxml2/trunk/src/wbxml_encoder.c
+===================================================================
+--- /wbxml2/trunk/src/wbxml_encoder.c (revision 57)
++++ /wbxml2/trunk/src/wbxml_encoder.c (revision 59)
+@@ -1901,5 +1901,5 @@
+      */
+ 
+-    if (ctx == WBXML_VALUE_ELEMENT_CTX_ATTR) {
++    if ((ctx == WBXML_VALUE_ELEMENT_CTX_ATTR) && (encoder->current_attr != NULL)) {
+         switch (encoder->lang->langID) {
+ #if defined( WBXML_SUPPORT_SI )
