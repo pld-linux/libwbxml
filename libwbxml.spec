@@ -19,6 +19,7 @@ BuildRequires:	cmake
 BuildRequires:	expat-devel
 BuildRequires:	libstdc++-devel
 BuildRequires:	libtool
+BuildConflicts:	wbxml2
 Obsoletes:	libwbxml2
 Obsoletes:	wbxml2
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
