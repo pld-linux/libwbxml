@@ -7,12 +7,12 @@
 Summary:	The WBXML Library
 Summary(pl.UTF-8):	Biblioteka WBXML
 Name:		libwbxml
-Version:	0.10.1
+Version:	0.10.7
 Release:	1
 License:	LGPL v2.1+
 Group:		Libraries
 Source0:	http://dl.sourceforge.net/libwbxml/%{name}-%{version}.tar.bz2
-# Source0-md5:	56609295e7cea5115750f6582218ade6
+# Source0-md5:	1f65a3f836df395a7839f3d331b0c6e7
 Patch15:	wbxml2-r59.patch
 URL:		http://libwbxml.opensync.org/
 BuildRequires:	cmake
