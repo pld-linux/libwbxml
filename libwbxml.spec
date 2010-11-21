@@ -1,5 +1,4 @@
 # TODO:
-# - kill unecessary -lnsl etc.
 # - maybe add datetime.patch from synce repository
 # - namespace.patch from synce trunk contains some improvements
 # - build dynamic documentation                  OFF
@@ -7,12 +6,12 @@
 Summary:	The WBXML Library
 Summary(pl.UTF-8):	Biblioteka WBXML
 Name:		libwbxml
-Version:	0.10.7
-Release:	2
+Version:	0.10.8
+Release:	1
 License:	LGPL v2.1+
 Group:		Libraries
-Source0:	http://dl.sourceforge.net/libwbxml/%{name}-%{version}.tar.bz2
-# Source0-md5:	1f65a3f836df395a7839f3d331b0c6e7
+Source0:	http://downloads.sourceforge.net/libwbxml/%{name}-%{version}.tar.bz2
+# Source0-md5:	7b51c425fc2ff9f502cd9b1e291b1955
 Patch15:	wbxml2-r59.patch
 URL:		http://libwbxml.opensync.org/
 BuildRequires:	cmake
@@ -57,12 +56,15 @@ Pliki nagłówkowe biblioteki WBXML.
 %build
 install -d build
 cd build
-%cmake \
+%cmake .. \
+	-DCMAKE_BUILD_TYPE=%{!?debug:Release}%{?debug:Debug} \
+	-DCMAKE_C_FLAGS_RELEASE="-DNDEBUG" \
 	-DCMAKE_INSTALL_PREFIX=%{_prefix} \
+	-DCMAKE_VERBOSE_MAKEFILE=ON \
 %if "%{_lib}" != "lib"
-	-DLIB_SUFFIX=64 \
+	-DLIB_SUFFIX=64
 %endif
-	../
+
 %{__make}
 
 %install
@@ -70,7 +72,7 @@ rm -rf $RPM_BUILD_ROOT
 %{__make} -C build install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-rm -rf $RPM_BUILD_ROOT%{_docdir}/%{name}
+%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/%{name}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -80,7 +82,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS BUGS ChangeLog NEWS README THANKS TODO References
+# COPYING contains just license information, not LGPL text itself
+%doc AUTHORS BUGS COPYING ChangeLog NEWS README THANKS TODO References
 %attr(755,root,root) %{_bindir}/wbxml2xml
 %attr(755,root,root) %{_bindir}/xml2wbxml
 %attr(755,root,root) %{_libdir}/libwbxml2.so.*.*.*
