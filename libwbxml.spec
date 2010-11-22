@@ -12,12 +12,13 @@ License:	LGPL v2.1+
 Group:		Libraries
 Source0:	http://downloads.sourceforge.net/libwbxml/%{name}-%{version}.tar.bz2
 # Source0-md5:	7b51c425fc2ff9f502cd9b1e291b1955
-Patch15:	wbxml2-r59.patch
+Patch0:		wbxml2-r59.patch
 URL:		http://libwbxml.opensync.org/
 BuildRequires:	cmake
 BuildRequires:	expat-devel
 BuildRequires:	libstdc++-devel
 BuildRequires:	libtool
+BuildRequires:	rpmbuild(macros) >= 1.577
 BuildConflicts:	wbxml2
 Obsoletes:	libwbxml2
 Obsoletes:	wbxml2
@@ -51,19 +52,14 @@ Pliki nagłówkowe biblioteki WBXML.
 
 %prep
 %setup -q
-%patch15 -p3
+%patch0 -p3
 
 %build
 install -d build
 cd build
 %cmake .. \
-	-DCMAKE_BUILD_TYPE=%{!?debug:Release}%{?debug:Debug} \
 	-DCMAKE_C_FLAGS_RELEASE="-DNDEBUG" \
-	-DCMAKE_INSTALL_PREFIX=%{_prefix} \
 	-DCMAKE_VERBOSE_MAKEFILE=ON \
-%if "%{_lib}" != "lib"
-	-DLIB_SUFFIX=64
-%endif
 
 %{__make}
 
