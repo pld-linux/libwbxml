@@ -18,7 +18,7 @@ BuildRequires:	cmake
 BuildRequires:	expat-devel
 BuildRequires:	libstdc++-devel
 BuildRequires:	libtool
-BuildRequires:	rpmbuild(macros) >= 1.577
+BuildRequires:	rpmbuild(macros) >= 1.586
 BuildConflicts:	wbxml2
 Obsoletes:	libwbxml2
 Obsoletes:	wbxml2
@@ -59,7 +59,6 @@ install -d build
 cd build
 %cmake .. \
 	-DCMAKE_C_FLAGS_RELEASE="-DNDEBUG" \
-	-DCMAKE_VERBOSE_MAKEFILE=ON \
 
 %{__make}
 
