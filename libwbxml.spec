@@ -6,18 +6,18 @@
 Summary:	The WBXML Library
 Summary(pl.UTF-8):	Biblioteka WBXML
 Name:		libwbxml
-Version:	0.10.8
-Release:	3
+Version:	0.11.4
+Release:	1
 License:	LGPL v2.1+
 Group:		Libraries
 Source0:	http://downloads.sourceforge.net/libwbxml/%{name}-%{version}.tar.bz2
-# Source0-md5:	7b51c425fc2ff9f502cd9b1e291b1955
+# Source0-md5:	89abc5342474dab2a74f515fb67e787a
+# partially fixed upstream (encoder->current_attr == NULL checked in SI10 and EMN10 cases, but not OTA_SETINGS)
 Patch0:		wbxml2-r59.patch
 URL:		http://libwbxml.opensync.org/
-BuildRequires:	cmake
+BuildRequires:	cmake >= 2.4
 BuildRequires:	expat-devel
 BuildRequires:	libstdc++-devel
-BuildRequires:	libtool
 BuildRequires:	rpmbuild(macros) >= 1.586
 BuildConflicts:	wbxml2
 Obsoletes:	libwbxml2
@@ -57,8 +57,7 @@ Pliki nagłówkowe biblioteki WBXML.
 %build
 install -d build
 cd build
-%cmake .. \
-	-DCMAKE_C_FLAGS_RELEASE="-DNDEBUG" \
+%cmake ..
 
 %{__make}
 
@@ -78,14 +77,15 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 # COPYING contains just license information, not LGPL text itself
-%doc AUTHORS BUGS COPYING ChangeLog NEWS README THANKS TODO References
+%doc BUGS COPYING ChangeLog README THANKS TODO References
 %attr(755,root,root) %{_bindir}/wbxml2xml
 %attr(755,root,root) %{_bindir}/xml2wbxml
 %attr(755,root,root) %{_libdir}/libwbxml2.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libwbxml2.so.0
+%attr(755,root,root) %ghost %{_libdir}/libwbxml2.so.1
 
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libwbxml2.so
-%{_includedir}/wbxml*.h
+%{_includedir}/libwbxml-1.0
 %{_pkgconfigdir}/libwbxml2.pc
+%{_datadir}/cmake/Modules/FindLibWbxml2.cmake
