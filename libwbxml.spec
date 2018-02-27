@@ -6,15 +6,15 @@
 Summary:	The WBXML Library
 Summary(pl.UTF-8):	Biblioteka WBXML
 Name:		libwbxml
-Version:	0.11.4
+Version:	0.11.6
 Release:	1
 License:	LGPL v2.1+
 Group:		Libraries
 Source0:	http://downloads.sourceforge.net/libwbxml/%{name}-%{version}.tar.bz2
-# Source0-md5:	89abc5342474dab2a74f515fb67e787a
+# Source0-md5:	726e736bc28dce312d268f671ba65835
 # partially fixed upstream (encoder->current_attr == NULL checked in SI10 and EMN10 cases, but not OTA_SETINGS)
 Patch0:		wbxml2-r59.patch
-URL:		http://libwbxml.opensync.org/
+URL:		https://github.com/libwbxml/libwbxml
 BuildRequires:	cmake >= 2.4
 BuildRequires:	expat-devel
 BuildRequires:	libstdc++-devel
