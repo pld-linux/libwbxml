@@ -52,7 +52,7 @@ Pliki nagłówkowe biblioteki WBXML.
 
 %prep
 %setup -q
-%patch0 -p3
+%patch -P0 -p3
 
 %build
 install -d build
