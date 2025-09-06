@@ -6,22 +6,21 @@
 Summary:	The WBXML Library
 Summary(pl.UTF-8):	Biblioteka WBXML
 Name:		libwbxml
-Version:	0.11.6
+Version:	0.11.10
 Release:	1
 License:	LGPL v2.1+
 Group:		Libraries
-Source0:	http://downloads.sourceforge.net/libwbxml/%{name}-%{version}.tar.bz2
-# Source0-md5:	726e736bc28dce312d268f671ba65835
-# partially fixed upstream (encoder->current_attr == NULL checked in SI10 and EMN10 cases, but not OTA_SETINGS)
-Patch0:		wbxml2-r59.patch
+Source0:	https://github.com/libwbxml/libwbxml/archive/libwbxml-%{version}/%{name}-libwbxml-%{version}.tar.gz
+# Source0-md5:	c1918b23520f080c5492a496485388e7
 URL:		https://github.com/libwbxml/libwbxml
-BuildRequires:	cmake >= 2.4
+BuildRequires:	cmake >= 3.5
 BuildRequires:	expat-devel
 BuildRequires:	libstdc++-devel
-BuildRequires:	rpmbuild(macros) >= 1.586
+BuildRequires:	pkgconfig
+BuildRequires:	rpmbuild(macros) >= 1.605
 BuildConflicts:	wbxml2
-Obsoletes:	libwbxml2
-Obsoletes:	wbxml2
+Obsoletes:	libwbxml2 < 0.10
+Obsoletes:	wbxml2 < 0.10
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -40,9 +39,9 @@ Summary:	Header files for WBXML library
 Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki WBXML
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
-Obsoletes:	libwbxml2-devel
-Obsoletes:	wbxml2-devel
-Obsoletes:	wbxml2-static
+Obsoletes:	libwbxml2-devel < 0.10
+Obsoletes:	wbxml2-devel < 0.10
+Obsoletes:	wbxml2-static < 0.10
 
 %description devel
 Header files for WBXML library.
@@ -51,8 +50,7 @@ Header files for WBXML library.
 Pliki nagłówkowe biblioteki WBXML.
 
 %prep
-%setup -q
-%patch -P0 -p3
+%setup -q -n %{name}-libwbxml-%{version}
 
 %build
 install -d build
@@ -63,6 +61,7 @@ cd build
 
 %install
 rm -rf $RPM_BUILD_ROOT
+
 %{__make} -C build install \
 	DESTDIR=$RPM_BUILD_ROOT
 
@@ -81,11 +80,11 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/wbxml2xml
 %attr(755,root,root) %{_bindir}/xml2wbxml
 %attr(755,root,root) %{_libdir}/libwbxml2.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libwbxml2.so.1
+%ghost %{_libdir}/libwbxml2.so.1
 
 %files devel
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libwbxml2.so
-%{_includedir}/libwbxml-1.0
+%{_libdir}/libwbxml2.so
+%{_includedir}/libwbxml-1.1
 %{_pkgconfigdir}/libwbxml2.pc
-%{_datadir}/cmake/Modules/FindLibWbxml2.cmake
+%{_libdir}/cmake/libwbxml2
